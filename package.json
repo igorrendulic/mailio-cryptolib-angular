@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "postinstall": "cd node_modules/sjcl && ./configure --with-all && make sjcl.js"
   },
   "private": true,
   "dependencies": {
@@ -22,7 +23,7 @@
     "file-saver": "^2.0.5",
     "nacl-stream": "^0.3.5",
     "rxjs": "~6.6.0",
-    "sjcl": "^1.0.8",
+    "sjcl": "https://github.com/bitwiseshiftleft/sjcl/tarball/master",
     "tslib": "^2.3.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
