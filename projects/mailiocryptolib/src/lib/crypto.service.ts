@@ -179,7 +179,7 @@ export class CryptoService {
    * @param base64CiphertextAndNonceAndSalt  base64 encoded ciphertext and nonce and salt
    * @returns
    */
-  static decryptAes256(password: string | sjcl.BitArray, base64CiphertextAndNonceAndSalt: string) {
+  static decryptAes256(password: string | sjcl.BitArray, base64CiphertextAndNonceAndSalt: string):string {
     // Decode the base64.
     var ciphertextAndNonceAndSalt = sjcl.codec.base64.toBits(base64CiphertextAndNonceAndSalt);
 
@@ -267,12 +267,12 @@ export class CryptoService {
    *
    * @param senderPrivateKey senders private key UInt8Array
    * @param receiverPublicKey receivers public key UInt8Array
-   * @param aes256RandomEncryptionKey random encryption key
+   * @param message message
    * @param nonce nonce
    * @returns UInt8Array
    */
-  static boxEncrypt(senderPrivateKey: Uint8Array, receiverPublicKey: Uint8Array,aes256RandomEncryptionKey: Uint8Array, nonce: Uint8Array): Uint8Array {
-     return nacl.box(aes256RandomEncryptionKey, nonce, receiverPublicKey, senderPrivateKey);
+  static boxEncrypt(senderPrivateKey: Uint8Array, receiverPublicKey: Uint8Array,message: Uint8Array, nonce: Uint8Array): Uint8Array {
+     return nacl.box(message, nonce, receiverPublicKey, senderPrivateKey);
   }
 
    /**

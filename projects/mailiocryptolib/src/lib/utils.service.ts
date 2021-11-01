@@ -237,7 +237,7 @@ static Utf8ArrayToStr(array:any) {
                        ((char2 & 0x3F) << 6) |
                        ((char3 & 0x3F) << 0));
         break;
-    }
+      }
     }
 
     return out;

@@ -1,7 +1,23 @@
 import { TestBed } from '@angular/core/testing';
 
 import { CryptoService } from './crypto.service';
+import { MailioKeyPairs } from './models/MailioKeyPairs';
 import { PhrasesService } from './phrases.service';
+import * as nacl from 'tweetnacl';
+import * as naclutil from 'tweetnacl-util';
+import { UtilsService } from './utils.service';
+
+function createTestEncryptionKeys():MailioKeyPairs {
+  const allWords = PhrasesService.loadEnglishWords();
+  const menomonicArray:string[] = [];
+  for (let i=0; i<24; i++) {
+    const word = allWords[Math.floor(Math.random() * allWords.length)];
+    menomonicArray.push(word);
+  }
+  const mnemonic = menomonicArray.join(' ');
+  const pairs = CryptoService.createKeyPairs(mnemonic, 'test@mail.io');
+  return pairs;
+}
 
 describe('CryptoService', () => {
   let service: CryptoService;
@@ -24,14 +40,7 @@ describe('CryptoService', () => {
   });
 
   it('create keyparis from mnemonics and email', () => {
-    const allWords = PhrasesService.loadEnglishWords();
-    const menomonicArray:string[] = [];
-    for (let i=0; i<24; i++) {
-      const word = allWords[Math.floor(Math.random() * allWords.length)];
-      menomonicArray.push(word);
-    }
-    const mnemonic = menomonicArray.join(' ');
-    const pairs = CryptoService.createKeyPairs(mnemonic, 'test@mail.io');
+    const pairs = createTestEncryptionKeys();
     expect(pairs.boxKeyPair.publicKey.length).toEqual(32);
     expect(pairs.boxKeyPair.secretKey.length).toEqual(32);
     expect(pairs.signKeyPair.publicKey.length).toEqual(32);
@@ -56,6 +65,43 @@ describe('CryptoService', () => {
     const isValid = CryptoService.isValidAddress('test');
     expect(isValid).toBeFalsy();
     expect(CryptoService.isValidAddress('0x51e21f9a472c05a602e7f18edf76159e6c0dc8c5')).toBeTruthy();
+  });
+
+  it('nacl secret box', () => {
+    const keyPairs = createTestEncryptionKeys();
+    const nonce = nacl.randomBytes(24);
+    const key = keyPairs.boxKeyPair.secretKey;
+    var m = naclutil.decodeUTF8('test');
+    var cipher = CryptoService.secretBox(m, nonce, key);
+    const unboxed = CryptoService.secretUnbox(cipher, nonce, key);
+    expect(UtilsService.Utf8ArrayToStr(unboxed)).toEqual('test');
+  });
+
+  it('es25519 signature and validation', () => {
+    const keyPairs = createTestEncryptionKeys();
+    const signatureKey = keyPairs.signKeyPair.secretKey;
+    const b64SignatureKey = naclutil.encodeBase64(signatureKey);
+    const signature = CryptoService.sign('test', b64SignatureKey);
+    const isValid = CryptoService.validateSign(signature, naclutil.encodeBase64(keyPairs.signKeyPair.publicKey), 'test');
+    expect(isValid).toBeTruthy();
+  });
+
+  it('nacl public box', () => {
+    /**
+     * The Box uses the given public and private (secret) keys to derive a shared key,
+     * which is used with the nonce given to encrypt the given messages and to decrypt the given ciphertexts.
+     * The same shared key will be generated from both pairing of keys, so given two keypairs belonging to
+     * Alice (pkalice, skalice) and Bob (pkbob, skbob), the key derived from (pkalice, skbob) will equal that from (pkbob, skalice).
+     *
+     * Simple explanation: The box can be prepared so it can be sent over network to a specific user (in this case alices public key).
+     */
+    const bob = createTestEncryptionKeys();
+    const alice = createTestEncryptionKeys();
+    const nonce = nacl.randomBytes(24);
+    const message = naclutil.decodeUTF8('test');
+    const bobBoxWithEncryptedMessage = CryptoService.boxEncrypt(bob.boxKeyPair.secretKey, alice.boxKeyPair.publicKey, message, nonce);
+    const aliceBox = CryptoService.boxDecrypt(bobBoxWithEncryptedMessage, nonce, bob.boxKeyPair.publicKey, alice.boxKeyPair.secretKey);
+    expect(UtilsService.Utf8ArrayToStr(aliceBox)).toEqual('test');
   });
 
 });
