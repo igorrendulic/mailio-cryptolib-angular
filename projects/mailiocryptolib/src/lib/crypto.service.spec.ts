@@ -46,4 +46,16 @@ describe('CryptoService', () => {
     expect(service.sha512('test')).toEqual('ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db27ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff');
   });
 
+  it('aes256 encrypt decrypt', () => {
+    const encryptedbase64 = service.encryptAes256('test', 'test');
+    const decrypted = service.decryptAes256('test', encryptedbase64);
+    expect(decrypted).toEqual('test');
+  });
+
+  it('is valid address', () => {
+    const isValid = service.isValidAddress('test');
+    expect(isValid).toBeFalsy();
+    expect(service.isValidAddress('0x51e21f9a472c05a602e7f18edf76159e6c0dc8c5')).toBeTruthy();
+  });
+
 });

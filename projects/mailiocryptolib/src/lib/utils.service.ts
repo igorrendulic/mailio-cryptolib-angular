@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as naclstream from 'nacl-stream';
+import { FileChunk } from './models/FileChunk';
 
 @Injectable({
   providedIn: 'root'
@@ -141,18 +142,24 @@ static getFileText(fileData:any) {
     });
 }
 
-static nextChunk(blob:any, position:number, nextChunkSize:any) {
+static nextChunk(blob:any, position:number, nextChunkSize:any): FileChunk | null {
     var isLast = false;
     var chunk;
     if (nextChunkSize === -1) {
         if (position+2 >= blob.size) {
             Error('blob is too short');
-            return;
+            return null;
         }
         var data = blob.slice(position,position+4);
         var nextChunkSize = naclstream.readChunkLength(data);
         position = 4;
-        return {'chunk':null, 'position':position, 'nextChunkSize':nextChunkSize, 'isLast':isLast};
+        const r:FileChunk = {
+          chunk: null,
+          position: position,
+          nextChunkSize: nextChunkSize,
+          isLast: isLast,
+        }
+        return r
     } else {
         var end = position + nextChunkSize + 16 /* tag */ + 4 /* length */;
         if (end >= blob.byteLength) {
@@ -169,7 +176,13 @@ static nextChunk(blob:any, position:number, nextChunkSize:any) {
         }
         position = end;
     }
-    return {'chunk':chunk, 'position':position, 'nextChunkSize':nextChunkSize, 'isLast':isLast};
+    const r:FileChunk = {
+      chunk: chunk,
+      position: position,
+      nextChunkSize: nextChunkSize,
+      isLast: isLast,
+    }
+    return r;
 }
 
 static isEqualUint8Array(buf1:Uint8Array,buf2:Uint8Array) {
