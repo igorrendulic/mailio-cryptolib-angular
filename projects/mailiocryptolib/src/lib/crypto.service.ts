@@ -25,7 +25,7 @@ export class CryptoService {
    * @param count number of bits to generate
    * @returns
    */
-  secureRandom(count:number):number {
+  static secureRandom(count:number):number {
     var rand = new Uint32Array(1);
     var skip = 0x7fffffff - (0x7fffffff % count);
     var result;
@@ -47,11 +47,11 @@ export class CryptoService {
    * @param listOfWords list of all possible words
    * @returns space separated string of words
    */
-  getMnemonics(n:number, listOfWords:string[]):string {
+  static getMnemonics(n:number, listOfWords:string[]):string {
     var phrase = '';
     var word;
     for (var i = 0; i < n; i++) {
-      word = listOfWords[this.secureRandom(listOfWords.length)];
+      word = listOfWords[CryptoService.secureRandom(listOfWords.length)];
       phrase += word;
       if (i !== n - 1) {
         phrase += ' ';
@@ -66,7 +66,7 @@ export class CryptoService {
    * @param email mailio email address
    * @returns MailioKeyPairs
    */
-  createKeyPairs(mnemonic:string,email:string):MailioKeyPairs {
+  static createKeyPairs(mnemonic:string,email:string):MailioKeyPairs {
 
     var words = mnemonic.split(" ");
     if (words.length < 24 || words.length > 24) {
@@ -101,7 +101,7 @@ export class CryptoService {
    * @param phrase phrase to hash
    * @returns hex string
    */
-  sha256(phrase:string):string {
+  static sha256(phrase:string):string {
     var bitArray = sjcl.hash.sha256.hash(phrase);
     var hex = sjcl.codec.hex.fromBits(bitArray);
     return hex;
@@ -112,7 +112,7 @@ export class CryptoService {
    * @param phrase phrase to hash
    * @returns hex string
    */
-  sha512(phrase:string):string {
+  static sha512(phrase:string):string {
     var bitArray = sjcl.hash.sha512.hash(phrase);
     var hex = sjcl.codec.hex.fromBits(bitArray);
     return hex;
@@ -125,7 +125,7 @@ export class CryptoService {
    * @param key password derived from password using PBKDF2.
    * @returns encrypted sjcl.BitArray
    */
-  encrypt(plaintext: sjcl.BitArray, key: sjcl.BitArray): sjcl.BitArray {
+  static encrypt(plaintext: sjcl.BitArray, key: sjcl.BitArray): sjcl.BitArray {
     // Generate a 96-bit nonce using a CSPRNG.
     var nonce = sjcl.random.randomWords(ALGORITHM_NONCE_SIZE);
 
@@ -142,7 +142,7 @@ export class CryptoService {
    * @param key derived from password using PBKDF2.
    * @returns decrypted sjcl.BitArray
    */
-  decrypt(ciphertextAndNonce: sjcl.BitArray, key: sjcl.BitArray) {
+  static decrypt(ciphertextAndNonce: sjcl.BitArray, key: sjcl.BitArray) {
     // Create buffers of nonce and ciphertext.
     var nonce = sjcl.bitArray.bitSlice(ciphertextAndNonce, 0, ALGORITHM_NONCE_SIZE * BITS_PER_WORD);
     var ciphertext = sjcl.bitArray.bitSlice(ciphertextAndNonce, ALGORITHM_NONCE_SIZE * BITS_PER_WORD, sjcl.bitArray.bitLength(ciphertextAndNonce));
@@ -159,7 +159,7 @@ export class CryptoService {
    * @param plaintext plaintext to encrypt
    * @returns base64 encrypted text
    */
-  encryptAes256(password:string, plaintext:string):string {
+  static encryptAes256(password:string, plaintext:string):string {
     // Generate a 128-bit salt using a CSPRNG.
     var salt = sjcl.random.randomWords(PBKDF2_SALT_SIZE);
 
@@ -168,7 +168,7 @@ export class CryptoService {
 
     // Encrypt and prepend salt.
     var plaintextRaw = sjcl.codec.utf8String.toBits(plaintext);
-    var ciphertextAndNonceAndSalt = sjcl.bitArray.concat(salt, this.encrypt(plaintextRaw, key));
+    var ciphertextAndNonceAndSalt = sjcl.bitArray.concat(salt, CryptoService.encrypt(plaintextRaw, key));
 
     return sjcl.codec.base64.fromBits(ciphertextAndNonceAndSalt);
   }
@@ -179,7 +179,7 @@ export class CryptoService {
    * @param base64CiphertextAndNonceAndSalt  base64 encoded ciphertext and nonce and salt
    * @returns
    */
-  decryptAes256(password: string | sjcl.BitArray, base64CiphertextAndNonceAndSalt: string) {
+  static decryptAes256(password: string | sjcl.BitArray, base64CiphertextAndNonceAndSalt: string) {
     // Decode the base64.
     var ciphertextAndNonceAndSalt = sjcl.codec.base64.toBits(base64CiphertextAndNonceAndSalt);
 
@@ -191,7 +191,7 @@ export class CryptoService {
     var key = sjcl.misc.pbkdf2(password, salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE * BITS_PER_WORD);
 
     // Decrypt and return result.
-    return sjcl.codec.utf8String.fromBits(this.decrypt(ciphertextAndNonce, key));
+    return sjcl.codec.utf8String.fromBits(CryptoService.decrypt(ciphertextAndNonce, key));
   }
 
   /**
@@ -201,7 +201,7 @@ export class CryptoService {
    * @param chunkSize
    * @returns
    */
-  decryptFile(message: string | any[], encKeyBytes: any, chunkSize: number) {
+  static decryptFile(message: string | any[], encKeyBytes: any, chunkSize: number) {
 
     var nonce = message.slice(0,16);
     var blob = message.slice(16,message.length);
@@ -254,7 +254,7 @@ export class CryptoService {
    * @param address string
    * @returns boolean
    */
-  isValidAddress(address: string):boolean {
+  static isValidAddress(address: string):boolean {
     return /^0x[0-9a-fA-F]{40}$/.test(address)
   }
 
@@ -271,7 +271,7 @@ export class CryptoService {
    * @param nonce nonce
    * @returns UInt8Array
    */
-  boxEncrypt(senderPrivateKey: Uint8Array, receiverPublicKey: Uint8Array,aes256RandomEncryptionKey: Uint8Array, nonce: Uint8Array): Uint8Array {
+  static boxEncrypt(senderPrivateKey: Uint8Array, receiverPublicKey: Uint8Array,aes256RandomEncryptionKey: Uint8Array, nonce: Uint8Array): Uint8Array {
      return nacl.box(aes256RandomEncryptionKey, nonce, receiverPublicKey, senderPrivateKey);
   }
 
@@ -289,7 +289,7 @@ export class CryptoService {
    * @param nonce nonce
    * @returns UInt8Array
    */
-  boxDecrypt(message: Uint8Array,nonce: Uint8Array,senderPublicKey: Uint8Array, receiverSecretKey: Uint8Array): Uint8Array | null {
+  static boxDecrypt(message: Uint8Array,nonce: Uint8Array,senderPublicKey: Uint8Array, receiverSecretKey: Uint8Array): Uint8Array | null {
     return nacl.box.open(message,nonce,senderPublicKey, receiverSecretKey);
   }
 
@@ -307,7 +307,7 @@ export class CryptoService {
    * @param key This must be kept secret, this is the combination to your safe
    * @returns encrypted message
    */
-  secretBox(message: Uint8Array, nonce: Uint8Array, key: Uint8Array): Uint8Array {
+  static secretBox(message: Uint8Array, nonce: Uint8Array, key: Uint8Array): Uint8Array {
     return nacl.secretbox(message, nonce, key);
   }
 
@@ -321,7 +321,7 @@ export class CryptoService {
    * @param key This must be kept secret, this is the combination to your safe
    * @returns decrypted message
    */
-  secretUnbox(box: Uint8Array, nonce: Uint8Array, key: Uint8Array): Uint8Array | null {
+  static secretUnbox(box: Uint8Array, nonce: Uint8Array, key: Uint8Array): Uint8Array | null {
     return nacl.secretbox.open(box, nonce, key);
   }
 
@@ -332,7 +332,7 @@ export class CryptoService {
    * @param signatureKey base64 encodeded signature key
    * @returns
    */
-  sign(message: string, signatureKey: string):string  {
+  static sign(message: string, signatureKey: string):string  {
     var sk = naclutil.decodeBase64(signatureKey);
     return naclutil.encodeBase64(nacl.sign.detached(naclutil.decodeUTF8(message), sk));
   }
@@ -345,7 +345,7 @@ export class CryptoService {
    * @param message base64 encoded signed message
    * @returns true/false boolean
    */
-  validateSign(signature: string, publicSignKey: string, message: string):boolean {
+  static validateSign(signature: string, publicSignKey: string, message: string):boolean {
     var pk = naclutil.decodeBase64(publicSignKey);
     var sign = naclutil.decodeBase64(signature);
     return nacl.sign.detached.verify(naclutil.decodeUTF8(message), sign, pk);
@@ -357,7 +357,7 @@ export class CryptoService {
    * @param key base64 encoded key
    * @returns true/false boolean
    */
-  validateRSAKey(key: string):boolean {
+  static validateRSAKey(key: string):boolean {
     var base64Match = new RegExp(
         '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$'
     )
