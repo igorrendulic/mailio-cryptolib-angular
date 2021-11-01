@@ -85,7 +85,7 @@ static httpGet(url:string) {
     });
 }
 
-static httpDownload(url:string) {
+static httpDownload(url:string): Promise<any> {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         xhr.responseType = 'blob';

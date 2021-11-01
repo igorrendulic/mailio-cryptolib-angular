@@ -15,26 +15,26 @@ describe('StorageService', () => {
   });
 
   it('setting the key', () => {
-    service.setKey('test_1', 'test');
-    service.setKey('test_2', 'test');
-    expect(service.getKey('test_1')).toBe('test');
-    expect(service.getKey('test_2')).toBe('test');
+    StorageService.setKey('test_1', 'test');
+    StorageService.setKey('test_2', 'test');
+    expect(StorageService.getKey('test_1')).toBe('test');
+    expect(StorageService.getKey('test_2')).toBe('test');
   });
 
   it('find all keys by prefix', () => {
-    service.setKey('test_1', 'test_1');
-    service.setKey('test_2', 'test_2');
-    expect(service.findAllByPrefix('test_')).toEqual({1: 'test_1', 2: 'test_2'});
+    StorageService.setKey('test_1', 'test_1');
+    StorageService.setKey('test_2', 'test_2');
+    expect(StorageService.findAllByPrefix('test_')).toEqual({1: 'test_1', 2: 'test_2'});
   });
 
   it('set the cookie', () => {
-    service.setCookie('test_1', 'test_1', 1);
-    expect(service.getCookie('test_1')).toBe('test_1');
+    StorageService.setCookie('test_1', 'test_1', 1);
+    expect(StorageService.getCookie('test_1')).toBe('test_1');
   });
 
   it('delete cookie', () => {
-    service.setCookie('test_1', 'test_1', 1);
-    service.deleteCookie('test_1');
-    expect(service.getCookie('test_1')).toBeNull();
+    StorageService.setCookie('test_1', 'test_1', 1);
+    StorageService.deleteCookie('test_1');
+    expect(StorageService.getCookie('test_1')).toBeNull();
   });
 });

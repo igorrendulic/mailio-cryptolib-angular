@@ -7,15 +7,15 @@ export class StorageService {
 
   constructor() { }
 
-  getKey(key:string) {
+  static getKey(key:string) {
     return window.localStorage.getItem(key);
   }
 
-  setKey(key:string, value:string) {
+  static setKey(key:string, value:string) {
     window.localStorage.setItem(key, value);
   }
 
-  findAllByPrefix(prefix:string) {
+  static findAllByPrefix(prefix:string) {
     var all = {};
     for (var i=0; i<window.localStorage.length; i++) {
         var key = window.localStorage.key(i);
@@ -28,14 +28,14 @@ export class StorageService {
     return all;
   }
 
-  setCookie(cookieName:string, cookieValue:string, nDays:number) {
+  static setCookie(cookieName:string, cookieValue:string, nDays:number) {
       var d = new Date();
       d.setTime(d.getTime() + (nDays*24*60*60*1000));
       var expires = "expires="+ d.toUTCString();
       document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
   }
 
-  getCookie(cookieName:string) {
+  static getCookie(cookieName:string) {
     var name = cookieName + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
@@ -51,8 +51,8 @@ export class StorageService {
     return null;
   }
 
-  deleteCookie(cookieName) {
-    this.setCookie(cookieName,'',-730);
+  static deleteCookie(cookieName) {
+    StorageService.setCookie(cookieName,'',-730);
   }
 
 }
