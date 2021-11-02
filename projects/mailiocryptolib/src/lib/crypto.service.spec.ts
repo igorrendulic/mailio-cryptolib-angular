@@ -56,8 +56,8 @@ describe('CryptoService', () => {
   });
 
   it('aes256 encrypt decrypt', () => {
-    const encryptedbase64 = CryptoService.encryptAes256('test', 'test');
-    const decrypted = CryptoService.decryptAes256('test', encryptedbase64);
+    const encryptedbase64 = CryptoService.encryptAES('test', 'test');
+    const decrypted = CryptoService.decryptAES('test', encryptedbase64);
     expect(decrypted).toEqual('test');
   });
 

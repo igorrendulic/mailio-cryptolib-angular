@@ -159,7 +159,7 @@ export class CryptoService {
    * @param plaintext plaintext to encrypt
    * @returns base64 encrypted text
    */
-  static encryptAes256(password:string, plaintext:string):string {
+  static encryptAES(password:string, plaintext:string):string {
     // Generate a 128-bit salt using a CSPRNG.
     var salt = sjcl.random.randomWords(PBKDF2_SALT_SIZE);
 
@@ -179,7 +179,7 @@ export class CryptoService {
    * @param base64CiphertextAndNonceAndSalt  base64 encoded ciphertext and nonce and salt
    * @returns
    */
-  static decryptAes256(password: string | sjcl.BitArray, base64CiphertextAndNonceAndSalt: string):string {
+  static decryptAES(password: string | sjcl.BitArray, base64CiphertextAndNonceAndSalt: string):string {
     // Decode the base64.
     var ciphertextAndNonceAndSalt = sjcl.codec.base64.toBits(base64CiphertextAndNonceAndSalt);
 
@@ -330,7 +330,7 @@ export class CryptoService {
    *
    * @param message base64 encoded message
    * @param signatureKey base64 encodeded signature key
-   * @returns
+   * @returns base64 encoded signature
    */
   static sign(message: string, signatureKey: string):string  {
     var sk = naclutil.decodeBase64(signatureKey);

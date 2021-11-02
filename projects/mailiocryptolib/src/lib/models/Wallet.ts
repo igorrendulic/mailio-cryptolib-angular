@@ -1,7 +1,7 @@
 export interface EncryptedWallet {
   address: string,
   encryptedWallet: string,
-  walletPhrase: string, // sha256 encoded email phrase from email+password concatenated string
+  walletPhrase?: string, // sha256 encoded email phrase from email+password concatenated string
   email: string, // full email address (e.g. test@mail.io)
   backupMnemonic?: string, // 24 words as backup phrase
 }

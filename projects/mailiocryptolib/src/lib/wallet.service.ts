@@ -37,7 +37,7 @@ export class WalletService {
         throw "No wallet";
     }
     try {
-        var decr = CryptoService.decryptAes256(encPhrase,mailiowallet);
+        var decr = CryptoService.decryptAES(encPhrase,mailiowallet);
         let parsed:Wallet = JSON.parse(decr);
         return parsed;
     } catch (err) {
@@ -68,11 +68,10 @@ export class WalletService {
     }
     var wallet = this._walletResponse(keyPairs,email, address);
 
-    var encryptedWallet = CryptoService.encryptAes256(encPhrase, JSON.stringify(wallet));
+    var encryptedWallet = CryptoService.encryptAES(encPhrase, JSON.stringify(wallet));
     const res:EncryptedWallet = {
         encryptedWallet: encryptedWallet,
         backupMnemonic: backupMnemonic,
-        walletPhrase: encPhrase,
         email: email,
         address: address,
     }
@@ -92,10 +91,9 @@ export class WalletService {
     var address = this._createAddress(keyPairs.boxKeyPair.publicKey);
     const wallet = this._walletResponse(keyPairs, email, address);
     const encPhrase = this.phrase(email, newPassword);
-    const encryptedWallet = CryptoService.encryptAes256(encPhrase, JSON.stringify(wallet));
+    const encryptedWallet = CryptoService.encryptAES(encPhrase, JSON.stringify(wallet));
     const w:EncryptedWallet = {
       encryptedWallet:encryptedWallet,
-      walletPhrase: encPhrase,
       email: wallet.email,
       address: wallet.address
     }
