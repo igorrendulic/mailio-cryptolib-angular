@@ -8,12 +8,12 @@ describe('MailioService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [{provide: MAILIO_CONFIG, useValue: {
-        aws_key: 'abc',
-        bucket: '/bucket',
-        awsRegion: 'us-somewhere-1',
-        signerUrl: 'https://example.com',
-      }}]
+      // providers: [{provide: MAILIO_CONFIG, useValue: {
+      //   aws_key: 'abc',
+      //   bucket: '/bucket',
+      //   awsRegion: 'us-somewhere-1',
+      //   signerUrl: 'https://example.com',
+      // }}]
     });
     service = TestBed.inject(MailioService);
   });

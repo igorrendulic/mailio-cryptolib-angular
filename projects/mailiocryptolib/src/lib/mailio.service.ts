@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { MAILIO_CONFIG } from './config';
 import { CryptoService } from './crypto.service';
 import { MailioConfig } from './models/MailioConfig';
@@ -19,11 +19,14 @@ export class MailioService {
   walletPrefix = 'mailiosk:';
   config:MailioConfig;
 
-  constructor( @Inject(MAILIO_CONFIG) config: MailioConfig, private walletService:WalletService) {
+  // configuration is optional
+  constructor( @Optional() @Inject(MAILIO_CONFIG) config: MailioConfig, private walletService:WalletService) {
     this.config = config;
-    const isValid = this._validateConfig(config);
-    if (!isValid) {
-      throw new Error('Invalid mailio config');
+    if (UtilsService.isNotNull(config)) {
+      const isValid = this._validateConfig(config);
+      if (!isValid) {
+        throw new Error('Invalid mailio config');
+      }
     }
   }
 
