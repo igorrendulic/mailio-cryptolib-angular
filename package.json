@@ -1,13 +1,15 @@
 {
   "name": "mailiolib",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "clean": "rimraf ./dist",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "postinstall": "cd node_modules/sjcl && ./configure --with-all && make sjcl.js"
+    "test": "ng test --watch=false --browsers=ChromeHeadlessCustom",
+    "postinstall": "cd node_modules/sjcl && ./configure --with-all && make sjcl.js",
+    "build:ci": "npm run clean && npm run test && npm run build"
   },
   "private": true,
   "dependencies": {
@@ -44,6 +46,7 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
     "ng-packagr": "^12.1.1",
+    "puppeteer": "^11.0.0",
     "typescript": "~4.3.5"
   }
 }
